@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>일일서류</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h1>일일서류</h1>
+        <span class="brand-sub">안전서류 작성·백업</span>
+      </div>
+
+      <div class="sidebar-quick">
+        <button id="btn-sidebar-today" type="button" class="btn-primary btn-full">오늘 날짜로 이동</button>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="서류 및 메뉴">
+        <div class="nav-group-label">일일 서류 5종</div>
+        <button type="button" class="nav-item active" data-tab="doc1">① 안전교육일지</button>
+        <button type="button" class="nav-item" data-tab="doc2">② T.B.M 사진대지</button>
+        <button type="button" class="nav-item" data-tab="doc3">③ 안전 순회 점검표</button>
+        <button type="button" class="nav-item" data-tab="doc4">④ 무인 타워크레인 점검일지</button>
+        <button type="button" class="nav-item" data-tab="doc5">⑤ T.B.M 일지</button>
+
+        <div class="nav-group-label">관리</div>
+        <button type="button" class="nav-item" data-tab="archive">보관함</button>
+        <button type="button" class="nav-item" data-tab="settings">설정</button>
+        <button type="button" class="nav-item" data-tab="guide">사용 가이드</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="footer-label">데이터 폴더</div>
+        <div id="sidebar-data-dir" class="footer-path">확인 중...</div>
+        <div id="sidebar-contact" class="footer-contact">문의 : hguyswow@gmail.com</div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="date-controls">
+          <button id="btn-prev-day" type="button" class="btn-icon" title="전날">◀</button>
+          <input id="date-picker" type="date" aria-label="작업 날짜">
+          <button id="btn-next-day" type="button" class="btn-icon" title="다음날">▶</button>
+          <button id="btn-today" type="button" class="btn-secondary">오늘</button>
+        </div>
+        <div id="zoom-controls" class="zoom-controls" aria-label="서류 화면 배율">
+          <button id="btn-zoom-out" type="button" class="btn-icon" title="축소" aria-label="축소">－</button>
+          <button id="btn-zoom-reset" type="button" class="btn-secondary zoom-pct-btn" title="배율 100%로" aria-label="배율 100%로">100%</button>
+          <button id="btn-zoom-in" type="button" class="btn-icon" title="확대" aria-label="확대">＋</button>
+          <button id="btn-zoom-fit" type="button" class="btn-secondary" title="너비 맞춤" aria-label="너비 맞춤">너비 맞춤</button>
+        </div>
+        <div class="topbar-status">
+          <button id="btn-export-pdf" type="button" class="btn-primary">오늘 서류 PDF 만들기</button>
+          <button id="btn-print-all" type="button" class="btn-secondary">5종 일괄 인쇄</button>
+          <span id="day-status-badge" class="status-badge">불러오는 중</span>
+          <span id="global-toast" class="global-toast" aria-live="polite"></span>
+        </div>
+      </header>
+
+      <main class="content-pane">
+        <!-- ① 안전교육일지 -->
+        <section id="view-doc1" class="view-section"></section>
+
+        <!-- ② T.B.M 사진대지 -->
+        <section id="view-doc2" class="view-section hidden"></section>
+
+        <!-- ③ 안전 순회 점검표 -->
+        <section id="view-doc3" class="view-section hidden"></section>
+
+        <!-- ④ 무인 타워크레인 점검일지 -->
+        <section id="view-doc4" class="view-section hidden"></section>
+
+        <!-- ⑤ T.B.M 일지 -->
+        <section id="view-doc5" class="view-section hidden"></section>
+
+        <!-- 보관함 -->
+        <section id="view-archive" class="view-section hidden"></section>
+
+        <!-- 사용 가이드 -->
+        <section id="view-guide" class="view-section hidden"></section>
+
+        <!-- 자리표시 -->
+        <section id="view-placeholder" class="view-section hidden">
+          <div class="card placeholder-card">
+            <h2 id="placeholder-title">① 안전교육일지</h2>
+            <p id="placeholder-desc" class="muted">준비 중입니다. (DR-3~6 단계에서 양식 및 출력 기능이 구현됩니다.)</p>
+            <div class="placeholder-meta">
+              <div class="meta-row"><span class="meta-key">선택 날짜</span><span id="ph-date">-</span></div>
+              <div class="meta-row"><span class="meta-key">이월 출처</span><span id="ph-carried">-</span></div>
+              <div class="meta-row"><span class="meta-key">현장명</span><span id="ph-site">-</span></div>
+              <div class="meta-row"><span class="meta-key">교육대상 합계</span><span id="ph-headcount">-</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 설정 화면 -->
+        <section id="view-settings" class="view-section hidden">
+          <div class="settings-header">
+            <h2>설정</h2>
+            <button id="btn-save-settings" type="button" class="btn-primary">설정 저장</button>
+          </div>
+
+          <div class="settings-grid">
+            <div class="card">
+              <h3>데이터 폴더 및 추가 백업</h3>
+              <p class="muted">모든 설정, 도장 이미지, 날짜별 서류(JSON/사진/PDF)가 저장되는 경로입니다.</p>
+              <div class="dir-row">
+                <code id="set-data-dir">확인 중...</code>
+                <button id="btn-change-data-dir" type="button" class="btn-secondary">폴더 변경</button>
+              </div>
+              <div class="backup-box">
+                <div class="backup-label">추가 백업 폴더 (선택: NAS/공유폴더 등)</div>
+                <div class="dir-row">
+                  <code id="set-backup-dir">미지정</code>
+                  <button id="btn-pick-backup-dir" type="button" class="btn-secondary">선택</button>
+                  <button id="btn-clear-backup-dir" type="button" class="btn-secondary">비우기</button>
+                  <button id="btn-run-backup-now" type="button" class="btn-secondary">백업 지금 실행</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>현장 및 담당자 정보</h3>
+              <div class="form-grid">
+                <label class="field">
+                  <span>현장명</span>
+                  <input id="set-site-name" type="text" placeholder="예: OO역세권 도시시설물 공사">
+                </label>
+                <label class="field">
+                  <span>회사명</span>
+                  <input id="set-company-name" type="text" placeholder="예: (주)바림건설">
+                </label>
+                <label class="field">
+                  <span>안전관리자 성명</span>
+                  <input id="set-safety-name" type="text" placeholder="예: 강민호">
+                </label>
+                <label class="field">
+                  <span>안전관리자 직책</span>
+                  <input id="set-safety-title" type="text" placeholder="안전관리자">
+                </label>
+                <label class="field">
+                  <span>현장소장</span>
+                  <input id="set-site-manager" type="text" placeholder="성명 입력">
+                </label>
+                <label class="field">
+                  <span>총괄책임자</span>
+                  <input id="set-general-manager" type="text" placeholder="성명 입력">
+                </label>
+                <label class="field">
+                  <span>타워크레인 운전자</span>
+                  <input id="set-crane-operator" type="text" placeholder="성명 입력">
+                </label>
+                <label class="field">
+                  <span>교육장소 기본값</span>
+                  <input id="set-edu-place" type="text" placeholder="현장">
+                </label>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head-row">
+                <h3>교육대상 구분 목록</h3>
+                <button id="btn-add-category" type="button" class="btn-secondary">+ 구분 추가</button>
+              </div>
+              <p class="muted">1쪽 안전교육일지 및 3쪽 순회점검 인원 기준에 반영됩니다.</p>
+              <div id="category-list" class="category-list"></div>
+              <label class="field absorb-field">
+                <span>나머지 흡수 구분 (실시인원 고정 모드 시 자동 보정)</span>
+                <select id="set-absorb-idx"></select>
+              </label>
+            </div>
+
+            <div class="card">
+              <h3>무재해 목표 설정</h3>
+              <label class="checkbox-row">
+                <input id="set-zero-enabled" type="checkbox">
+                <span>안전 순회 점검표에 무재해 목표시간 행 표시</span>
+              </label>
+              <label class="field">
+                <span>무재해 목표시간 (시간)</span>
+                <input id="set-zero-target" type="number" min="0" step="100">
+              </label>
+            </div>
+
+            <div class="card">
+              <h3>교육내용 기본 템플릿</h3>
+              <p class="muted">새 날짜 시작 시 전일 데이터가 없을 때 기본으로 채워집니다.</p>
+              <textarea id="set-edu-template" rows="7"></textarea>
+            </div>
+
+            <div class="card card-wide">
+              <div class="card-head-row">
+                <h3>공사현황 (2단계 AI 자동 생성 입력)</h3>
+                <button id="btn-add-process" type="button" class="btn-secondary">+ 공종 추가</button>
+              </div>
+              <div class="form-grid">
+                <label class="field">
+                  <span>공사명 (미입력 시 현장명 사용)</span>
+                  <input id="set-const-project" type="text" placeholder="예: OO역세권 보도육교 설치공사">
+                </label>
+                <label class="field">
+                  <span>계절 / 기상 메모</span>
+                  <input id="set-const-season" type="text" placeholder="예: 동절기 노면 결빙·강풍 주의">
+                </label>
+              </div>
+              <label class="field" style="margin-top: 10px;">
+                <span>공사 개요</span>
+                <textarea id="set-const-overview" rows="2" placeholder="전체 공사 범위 및 주요 구조물 개요"></textarea>
+              </label>
+              <div class="sub-label">진행 중인 공종 목록</div>
+              <div id="process-list" class="category-list"></div>
+              <label class="field" style="margin-top: 8px;">
+                <span>기타 공사현황 메모 (자유 서술)</span>
+                <textarea id="set-construction-memo" rows="3" placeholder="금일/주간 주요 공사현황을 메모해 두세요."></textarea>
+              </label>
+            </div>
+
+            <div class="card card-wide">
+              <div class="card-head-row">
+                <h3>공정표 (주간/월간)</h3>
+                <button id="btn-add-schedule" type="button" class="btn-secondary">+ 행 추가</button>
+              </div>
+              <div class="ai-notice" style="margin-bottom: 8px;">외부 AI 사용 시 공정표의 작업내용·장비·비고만 프롬프트에 포함되며 근로자 명단·도장·연락처 등 개인정보는 전송되지 않습니다.</div>
+              <div class="ai-notice" style="margin-bottom: 8px;">외부 AI 사용 시 라이브러리 항목이 참고로 함께 전송됩니다.</div>
+              <label class="batch-check-label" style="margin-bottom: 10px;"><input id="set-ai-risklib-assist" type="checkbox" checked><span>AI 생성 시 위험성평가 라이브러리 참고</span></label>
+              <table class="schedule-table">
+                <thead>
+                  <tr>
+                    <th style="width:130px">시작일</th>
+                    <th style="width:130px">종료일</th>
+                    <th>작업내용</th>
+                    <th style="width:150px">주요장비</th>
+                    <th style="width:160px">비고</th>
+                    <th style="width:64px">삭제</th>
+                  </tr>
+                </thead>
+                <tbody id="schedule-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card card-wide">
+              <div class="card-head-row">
+                <h3>AI 연결 설정</h3>
+                <button id="btn-test-ai" type="button" class="btn-secondary">연결 테스트</button>
+              </div>
+              <div id="ai-privacy-notice" class="ai-notice">로컬/내부 실행 방식입니다.</div>
+              <div class="form-grid" style="margin-top: 10px;">
+                <label class="field">
+                  <span>AI 엔진 선택</span>
+                  <select id="set-ai-engine">
+                    <option value="hermes">Hermes (로컬, 기본)</option>
+                    <option value="lmstudio">LM Studio (로컬 OpenAI 호환)</option>
+                    <option value="opencode">OpenCode (OpenAI 호환)</option>
+                    <option value="deepseek">DeepSeek</option>
+                    <option value="gemini">Gemini</option>
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="ollama">Ollama / Llama (로컬)</option>
+                    <option value="claude_cli">Claude Code CLI (claude 명령)</option>
+                    <option value="claude_mcp">Claude MCP (Claude 앱이 도구로 직접 입력)</option>
+                  </select>
+                </label>
+                <div id="ai-engine-status-box" class="field">
+                  <span>엔진 상태</span>
+                  <div id="ai-engine-badge" class="ai-engine-badge">실동작 가능 (DR-7)</div>
+                </div>
+              </div>
+
+              <div id="ai-hermes-fields" class="form-grid" style="margin-top: 10px;">
+                <label class="field" style="grid-column: 1 / -1;">
+                  <span>Hermes Endpoint</span>
+                  <input id="set-ai-hermes-ep" type="text" placeholder="http://127.0.0.1:7860/api/generate">
+                </label>
+              </div>
+
+              <div id="ai-compat-fields" class="form-grid hidden" style="margin-top: 10px;">
+                <label class="field">
+                  <span id="ai-baseurl-label">Base URL</span>
+                  <input id="set-ai-baseurl" type="text" placeholder="http://localhost:1234/v1">
+                </label>
+                <label class="field">
+                  <span>Model</span>
+                  <div class="dir-row">
+                    <input id="set-ai-model" type="text" list="ai-model-suggestions" placeholder="local-model" style="flex:1;">
+                    <datalist id="ai-model-suggestions"></datalist>
+                    <button id="btn-fetch-models" type="button" class="btn-secondary hidden">목록 불러오기</button>
+                  </div>
+                </label>
+                <div id="ai-key-row" class="field" style="grid-column: 1 / -1;">
+                  <span>API Key (secrets.json 별도 암호화/분리 저장 — settings.json 미저장)</span>
+                  <div class="dir-row">
+                    <code id="set-ai-key-masked">미등록</code>
+                    <input id="set-ai-key-input" type="password" placeholder="새 API 키 입력 후 '키 저장'" style="flex:1;">
+                    <button id="btn-save-ai-key" type="button" class="btn-secondary">키 저장</button>
+                    <button id="btn-del-ai-key" type="button" class="btn-danger">키 삭제</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="ai-mcp-fields" class="hidden" style="margin-top: 10px;">
+                <p class="muted">아래 "Claude MCP 연동 안내" 카드의 <code>.mcp.json</code> 스니펫을 복사해 Claude Code에 등록하세요.</p>
+              </div>
+
+              <p id="ai-test-result" class="status-msg" aria-live="polite"></p>
+            </div>
+
+            <div class="card card-wide">
+              <div class="card-head-row">
+                <h3>Claude MCP 연동 안내 (직접 등록)</h3>
+                <div class="toolbar-group">
+                  <button id="btn-copy-mcp-snippet" type="button" class="btn-secondary">.mcp.json 스니펫 복사</button>
+                  <button id="btn-copy-mcp-prompt" type="button" class="btn-secondary">예시 프롬프트 복사</button>
+                </div>
+              </div>
+              <p class="muted">앱이 설정 파일을 자동으로 수정하지 않습니다. 아래 설정을 프로젝트 또는 사용자 <code>.mcp.json</code>에 직접 추가하세요.<br>Claude 데스크탑 앱은 설정 → 개발자 → 구성 편집의 <code>claude_desktop_config.json</code> 의 <code>mcpServers</code> 에 같은 항목을 추가하세요.</p>
+              <pre id="mcp-config-snippet" class="mcp-snippet-box"></pre>
+              <div class="sub-label">사용 예 프롬프트</div>
+              <code id="mcp-example-prompt" class="mcp-prompt-box">오늘 공사현황을 바탕으로 dayrep 에 교육내용과 위험성평가를 작성해줘</code>
+            </div>
+
+            <div class="card card-wide">
+              <div class="card-head-row">
+                <h3>근로자 명단 (⑤ T.B.M 일지 불러오기용)</h3>
+                <button id="btn-add-worker" type="button" class="btn-secondary">+ 근로자 추가</button>
+              </div>
+              <p class="muted">직종과 성명을 등록해 두면 T.B.M 일지에서 "명단 불러오기" 버튼으로 30행 서명표를 채울 수 있습니다.</p>
+              <div id="worker-list" class="category-list"></div>
+            </div>
+
+            <div class="card card-wide">
+              <h3>결재란 도장 이미지 등록</h3>
+              <p class="muted">PNG/JPG/WEBP 이미지를 등록하면 결재란 칸별로 저장됩니다. (출력 시 켜고 끌 수 있습니다.)</p>
+              <div id="stamp-grid" class="stamp-grid"></div>
+            </div>
+
+            <div class="card card-wide">
+              <h3>출력 서류 선택</h3>
+              <p class="muted">체크 해제한 서류는 일괄 인쇄·PDF 만들기·백업 PDF에서 제외됩니다. 화면 편집과 저장은 그대로입니다.</p>
+              <div class="batch-radio-row" style="margin-top: 8px;">
+                <label class="batch-check-label"><input id="set-print-doc1" type="checkbox" checked><span>① 안전교육일지</span></label>
+                <label class="batch-check-label"><input id="set-print-doc2" type="checkbox" checked><span>② T.B.M 사진대지</span></label>
+                <label class="batch-check-label"><input id="set-print-doc3" type="checkbox" checked><span>③ 안전 순회 점검표</span></label>
+                <label class="batch-check-label"><input id="set-print-doc4" type="checkbox" checked><span>④ 무인 타워크레인 점검일지</span></label>
+                <label class="batch-check-label"><input id="set-print-doc5" type="checkbox" checked><span>⑤ T.B.M 일지</span></label>
+              </div>
+            </div>
+
+            <div class="card card-wide">
+              <h3>순회 점검표 점검결과 기본값 (③ 안전 순회 점검표)</h3>
+              <p class="muted">새로 만드는 날짜의 점검결과 초기값입니다. 이미 저장된 날짜의 데이터는 변경하지 않습니다.</p>
+              <div class="batch-radio-row" style="margin-top: 8px;">
+                <label class="batch-check-label"><input type="radio" name="set-patrol-default" value="good" checked><span>양호 (기본, 18개 항목 ○)</span></label>
+                <label class="batch-check-label"><input type="radio" name="set-patrol-default" value="blank"><span>비움 (감리단 수기 표기용)</span></label>
+              </div>
+            </div>
+
+            <div class="card card-wide" id="risklib-card">
+              <h3>위험성평가 라이브러리</h3>
+              <p class="muted">AI로 확정하거나 &quot;보관&quot; 버튼으로 저장한 위험성평가 항목이 자동 누적됩니다. 데이터 폴더(risk_library.json)에만 저장되며 외부로 전송되지 않습니다.</p>
+              <div id="risklib-summary" class="risklib-summary">전체 0건</div>
+              <div class="risklib-toolbar">
+                <input id="risklib-search" type="search" placeholder="장비·유해위험요인·감소대책·종류 검색">
+                <select id="risklib-cat-filter">
+                  <option value="">전체 종류</option>
+                </select>
+                <input id="risklib-bulk-cat" type="text" maxlength="30" placeholder="일괄 변경할 종류 (예: 공통)">
+                <button id="btn-risklib-bulk-cat" class="btn-secondary" type="button">종류 변경</button>
+                <button id="btn-risklib-clear" class="btn-danger" type="button">전체 비우기</button>
+              </div>
+              <div class="risklib-table-wrap">
+                <table class="risklib-table">
+                  <thead>
+                    <tr>
+                      <th style="width:32px;"><input id="risklib-check-all" type="checkbox" title="현재 목록 전체 선택"></th>
+                      <th style="width:92px;">종류</th>
+                      <th style="width:110px;">장비·도구</th>
+                      <th>유해·위험요인</th>
+                      <th style="width:76px;">재해유형</th>
+                      <th style="width:52px;">위험도</th>
+                      <th>감소대책</th>
+                      <th style="width:54px;">사용</th>
+                      <th style="width:112px;">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="risklib-tbody"></tbody>
+                </table>
+              </div>
+              <div class="risklib-footer">
+                <button id="btn-risklib-more" class="btn-secondary hidden" type="button">더 보기 (50건)</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="print-all-container" class="print-all-container"></div>
+  <div id="batch-modal-root" class="hidden no-print"></div>
+
+  <script src="js/schedule.js"></script>
+  <script src="js/carryover.js"></script>
+  <script src="js/risk_library.js"></script>
+  <script src="js/risk_picker_modal.js"></script>
+  <script src="js/headcount.js"></script>
+  <script src="js/ai_prompts.js"></script>
+  <script src="js/doc1.js"></script>
+  <script src="js/doc2.js"></script>
+  <script src="js/doc3.js"></script>
+  <script src="js/doc4.js"></script>
+  <script src="js/doc5.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/archive.js"></script>
+  <script src="js/batch.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/guide.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

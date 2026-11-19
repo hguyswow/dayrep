@@ -1,0 +1,26 @@
+[package]
+name = "dayrep"
+version = "0.1.0"
+description = "일일 안전서류 자동작성·출력·백업 시스템"
+authors = ["hguyswow"]
+edition = "2021"
+
+[lib]
+name = "dayrep_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = "0.4"
+base64 = "0.22"
+dirs = "5.0"
+rfd = "0.15"
+reqwest = { version = "0.12", features = ["json"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt"] }

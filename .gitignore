@@ -1,0 +1,27 @@
+# Dependencies & Build
+node_modules/
+mcp/node_modules/
+target/
+dist/
+src-tauri/target/
+src-tauri/gen/
+
+# User Data & Sensitive Local Files
+stamps/
+days/
+settings.json
+secrets.json
+data/
+*.corrupt
+*.corrupt.*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+_verify/
+
+# Source samples with real site/personnel info (never commit)
+*.pdf
+*.xlsm
+*.xlsx

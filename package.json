@@ -1,0 +1,21 @@
+{
+  "name": "dayrep",
+  "version": "0.1.0",
+  "description": "일일 안전서류 자동작성·출력·백업 시스템",
+  "main": "src/js/app.js",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.6"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.9.1"
+  }
+}
